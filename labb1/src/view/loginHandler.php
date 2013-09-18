@@ -65,11 +65,17 @@ class loginHandler {
             return "Du har nu loggat ut.";
         }
     }
-    /*
-    function __construct() {
-        $this->loginHandlerModel = new \model\loginHandler();
+    function getForm() {
+        return "<form method=\"post\" action=\"index.php\">
+            <fieldset>
+                <legend>Logga in</legend>
+                <label for=\"r_user\">Namn:</label><input type=\"text\" name=\"username\" placeholder=\"Ange användarnamn\" id=\"r_user\" value=\"\" />
+                <label for=\"r_pass\">Lösenord:</label><input type=\"password\" name=\"password\" placeholder=\"Ange lösenord\" id=\"r_pass\" />
+            </fieldset>
+            <input type=\"hidden\" name=\"login_atempt\" value=\"1\" />
+            <input type=\"submit\" value=\"Logga in\" />
+        </form>";
     }
-    */
 }
 
 ?>

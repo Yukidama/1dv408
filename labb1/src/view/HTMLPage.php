@@ -3,7 +3,12 @@
 namespace view;
 
 class HTMLPage {
-    function getHTMLPage($title, $body, $footer) {
+    
+    /**
+     * Returns a HTML Page from arguments
+     * @param \model\HTMLPage $htmlObj
+     */
+    function getHTMLPage(\model\HTMLPage $htmlObj) {
         return "
             <!doctype html>
             <html lang=\"sv\">
@@ -13,15 +18,13 @@ class HTMLPage {
                     <link rel=\"stylesheet\" type=\"text/css\" href=\"css/reset.css\" />
                     <link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />
                     
-                    <title>$title</title>
+                    <title>" . $htmlObj->getTitle() . "</title>
                 
                 </head>
                 <body>
-                    $body
-                    <p>$footer</p>
+                    " . $htmlObj->getBody() . "
+                    <p>" . $htmlObj->getFooter() . "</p>
                 </body>
             </html>";
     }
 }
-
-?>

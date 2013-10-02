@@ -1,29 +1,34 @@
 <?php
 
-    namespace view;
+namespace view;
+
+
+class DateAndTime {
     
-    require_once("src/model/dateAndTime.php");
+    /**
+     * @var \model\DateAndTime
+     */
+    private $dateAndTimeModel;
     
-    class dateAndTime {
-        
-        public function getString(\model\dateAndTime $dateAndTime) {
-            
-            //Fixa så att svenskt datum skrivs ut -- Måndag, den 8 Juli år 2013. Klockan är [10:59:21]
-            
-            $toEcho = $dateAndTime->getWeekDay() .", den ";
-            
-            $toEcho .= $dateAndTime->getDay() . " ";
-            
-            $toEcho .= $dateAndTime->getMonth() . " år ";
-            
-            $toEcho .= $dateAndTime->getYear() .". Klockan är ";
-            
-            $toEcho .= "[" . $dateAndTime->getTime() . "]";
-            
-            return $toEcho;
-        }
+    /**
+     * Constructor which takes a DateAndTime object
+     */
+    public function __construct(\model\DateAndTime $aDateAndTime) {
+        $this->dateAndTimeModel = $aDateAndTime;
     }
     
-    
-
-?>
+    /**
+     * Assembles a String with time and date
+     * @return String;
+     */
+    public function getString() {
+        
+        $toEcho = $this->dateAndTimeModel->getWeekDay() .", den ";
+        $toEcho .= $this->dateAndTimeModel->getDay() . " ";
+        $toEcho .= $this->dateAndTimeModel->getMonth() . " år ";
+        $toEcho .= $this->dateAndTimeModel->getYear() .". Klockan är ";
+        $toEcho .= "[" . $this->dateAndTimeModel->getTime() . "]";
+        
+        return $toEcho;
+    }
+}

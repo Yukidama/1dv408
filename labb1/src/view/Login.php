@@ -13,11 +13,6 @@ class Login {
     * @var String
     */
    private static $getLogout = "logout";
-   
-   /**
-    * @var String
-    */
-   private static $sessionUserID = "view::Login::userID";
 
    /**
     * @var String
@@ -33,6 +28,11 @@ class Login {
     * @var String
     */
    private $title = "Logga in tack";
+   
+   /**
+    * @var String
+    */
+   private static $keepLoggedIn = "keepLoggedIn";
    
    /**
     * @var \view\MessageHolder
@@ -66,9 +66,10 @@ class Login {
                <legend>Logga in</legend>
                $message
                <label for=\"r_user\">Användarnamn:</label><input type=\"text\" name=\"" .
-                  self::$postUsername ."\" placeholder=\"Ange användarnamn\" id=\"r_user\" value=\"\" />
+                  self::$postUsername ."\" placeholder=\"Ange användarnamn\" id=\"r_user\" value=\"" . (isset($_POST[self::$postUsername]) ? $_POST[self::$postUsername] : '') . "\" />
                <label for=\"r_pass\">Lösenord:</label><input type=\"password\" name=\"" .
                   self::$postPassword . "\" placeholder=\"Ange lösenord\" id=\"r_pass\" />
+                  <input type=\"checkbox\" name=\"" . self::$keepLoggedIn . "\" value=\"keep\" /> Håll mig inloggad
             </fieldset>
             <input type=\"submit\" value=\"Logga in\" />
          </form>";
@@ -94,7 +95,7 @@ class Login {
    * Tries to login user by validating the username och password.
    * @return BOOL
    */
-   public function loginSuccessed() {
+   public function loginProcedure() {
       //First things first, check if values are entered for both username and password
       //If ok, check with model if username and password are valid.
    
@@ -107,7 +108,6 @@ class Login {
       else {
          if ($this->loginModel->validateUser($_POST[self::$postUsername],
                                              $_POST[self::$postPassword])) {
-            $this->saveUserToSession();
             $this->messageHolder->setMessage("Inloggning lyckades");
             return true;
          }
@@ -116,28 +116,6 @@ class Login {
          }
       }
       return false;
-   }
-
-    
-   /**
-    * Try to login with Session
-    */
-   public function trySessionCookieLogin() {
-      if (isset($_SESSION[self::$sessionUserID])) {
-         $this->loginModel->setUserID($_SESSION[self::$sessionUserID]);
-      }
-   }
-   
-   /**
-    * Save current user to session
-    */
-   private function saveUserToSession() {
-      try {
-         $_SESSION[self::$sessionUserID] = $this->loginModel->getUserID();
-      }
-      catch(\Exception $e) {
-         //User is not logged in.
-      }
    }
 
    /**
@@ -156,18 +134,22 @@ class Login {
       return "<a href=\"?" . self::$getLogout . "\">Logga ut</a>";
    }
    
+      /**
+    * Check if user wants to use cookies for login in the future
+    * @return BOOL
+    */
+   public function userWantsCookie() {
+      if (isset($_POST[self::$keepLoggedIn])) {
+         return true;
+      }
+      return false;
+   }
+   
    /**
    * Unset cookies, sessiona and LoginModels userID
    */
    public function logoutUser() {
-      if (!isset($_SESSION[self::$sessionUserID])) {
-          throw new \Exception("Tries to logout without being logged in");
-      }
-      //Logout user by removing session and userID from model::Login
-      unset($_SESSION[self::$sessionUserID]);
-      if ($this->loginModel->isLoggedIn()) {
-          $this->loginModel->setUserID(null);
-          $this->messageHolder->setMessage("Du är nu utloggad");
-      }
+      $this->loginModel->setUserID(null);
+      $this->messageHolder->setMessage("Du är nu utloggad");
    }
 }

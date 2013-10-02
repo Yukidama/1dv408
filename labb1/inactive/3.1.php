@@ -1,3 +1,9 @@
+Frågor:
+
+View beror på view ?
+interface/observer, gå igenom?
+
+
 modell::Login
 
     /**

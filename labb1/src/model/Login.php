@@ -10,6 +10,11 @@ class Login {
     private $loggedInID;
     
     /**
+     * @var String
+     */
+    private $randomSalt = "DR#ms66MC!";
+    
+    /**
      * Temporary array as datasource for usernames.
      * UserID will always be 1 or higher when running a database
      * @var Array Usernames
@@ -76,5 +81,34 @@ class Login {
      */
     public function setUserID($aUserID) {
         $this->loggedInID = $aUserID;
+    }
+    
+    /**
+     * Login user with just a username
+     */
+    public function loginUser($aUsername) {
+        $userID = array_search($aUsername, self::$username);
+        if (is_numeric($userID) && $userID > 0) {
+            $this->setUserID($userID);
+        }
+        else {
+            throw new \Exception("Something wrong when using Username-login");
+        }
+    }
+    
+    /**
+     * Returns current users username
+     * @return String
+     */
+    public function getUsername() {
+        return self::$username[$this->loggedInID];
+    }
+    
+    /**
+     * Get random code for temporary passwords
+     * @return String
+     */
+    public function getRandomCode() {
+        return sha1(mt_rand().$this->randomSalt.time());
     }
 }

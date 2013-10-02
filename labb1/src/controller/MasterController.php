@@ -16,6 +16,7 @@ require("src/model/DateAndTime.php");
 require("src/view/DateAndTime.php");
 
 require("src/view/Navigation.php");
+require("src/view/SessionsAndCookies.php");
 
 require("src/view/MessageHolder.php");
 
@@ -43,11 +44,18 @@ class MasterController {
     private $messageHolder;
     
     /**
+     * @var \view\SessionsAndCookies
+     */
+    private $sessionsAndCookies;
+    
+    /**
      * constructor which creates object needed
      */
     public function __construct() {
         $this->loginModel = new \model\Login();
         $this->messageHolder = new \view\MessageHolder();
+        $this->sessionsAndCookies = new \view\SessionsAndCookies($this->loginModel,
+                                                                 $this->messageHolder);
         
         $this->loginView = new \view\Login($this->loginModel,
                                            $this->messageHolder);
@@ -62,20 +70,22 @@ class MasterController {
     public function runApplicationGetHTML() {
 
         //Try to find session-cookie for user
-        $this->loginView->trySessionCookieLogin();
+        $this->sessionsAndCookies->trySessionCookieLogin();
         
         $HTMLOutput = new \model\HTMLPage();
             
         if ($this->loginModel->isLoggedIn()) {
             $memberController = new \controller\MemberStuff($this->loginModel,
                                                             $this->loginView,
-                                                            $this->messageHolder);
+                                                            $this->messageHolder,
+                                                            $this->sessionsAndCookies);
             $HTMLOutput = $memberController->loggedInPage();
             //User is logged in
         }
         else {
             $loginController = new \controller\Login($this->loginModel,
-                                                     $this->loginView);
+                                                     $this->loginView,
+                                                     $this->sessionsAndCookies);
             $HTMLOutput = $loginController->loginPage();
             //User is not logged in
         }      

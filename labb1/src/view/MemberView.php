@@ -10,6 +10,11 @@ class MemberView {
     private $loginView;
     
     /**
+     * @var \model\Login
+     */
+    private $loginModel;
+    
+    /**
      * @var String
      */
     private $title = "Välkommen!";
@@ -22,10 +27,12 @@ class MemberView {
     /**
      * Concstructor which gets objects and set them as member variables
      */
-    public function __construct(\view\Login        $aLoginView,
+    public function __construct(\model\Login        $aLoginModel,
+                                \view\Login         $aLoginView,
                                 \view\MessageHolder $aMessageHolder) {
-        $this->loginView = $aLoginView;
         
+        $this->loginModel = $aLoginModel;
+        $this->loginView = $aLoginView;
         $this->messageHolder = $aMessageHolder;
     }
     
@@ -39,7 +46,7 @@ class MemberView {
             $message = "<p class=\"normalMessage\">" . $this->messageHolder->getMessageOnce() . "</p>";
         }
       
-        return "<h2>Välkommen! Du är nu inloggad!</h2>
+        return "<h2>". $this->loginModel->getUsername() ." är inloggad</h2>
             $message".
             $this->loginView->getLogoutLink();
     }

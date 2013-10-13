@@ -67,6 +67,7 @@ class Login {
     /**
      * returns users ID
      * @return Int;
+     * @throws Exception when method used in wrong situation
      */
     public function getUserID() {
         if ($this->loggedInID < 1) {
@@ -85,6 +86,7 @@ class Login {
     
     /**
      * Login user with just a username
+     * @throws Exception if username cant be find.
      */
     public function loginUser($aUsername) {
         $userID = array_search($aUsername, self::$username);

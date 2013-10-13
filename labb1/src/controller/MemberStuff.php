@@ -26,12 +26,12 @@ class MemberStuff {
      * constructor which takes objects and set them as member variables
      * @param \model\Login $aLoginModel
      * @param \view\Login $aLoginView
-     * @param \view\MessageHolder $aMessageHolder
-     * @param \view\SessionsAndCookies $aMessageHolder
+     * @param \model\MessageHolder $aMessageHolder
+     * @param \view\SessionsAndCookies $aSessionsAndCookies
      */
     public function __construct(\model\Login                $aLoginModel,
                                 \view\Login                 $aLoginView,
-                                \view\MessageHolder         $aMessageHolder,
+                                \model\MessageHolder         $aMessageHolder,
                                 \view\SessionsAndCookies    $aSessionsAndCookies) {
         
         $this->loginModel = $aLoginModel;

@@ -7,6 +7,7 @@ class HTMLPage {
     /**
      * Returns a HTML Page from arguments
      * @param \model\HTMLPage $htmlObj
+     * @return String HTML
      */
     function getHTMLPage(\model\HTMLPage $htmlObj) {
         return "

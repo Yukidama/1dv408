@@ -18,7 +18,7 @@ require("src/view/DateAndTime.php");
 require("src/view/Navigation.php");
 require("src/view/SessionsAndCookies.php");
 
-require("src/view/MessageHolder.php");
+require("src/model/MessageHolder.php");
 
 
 class MasterController {
@@ -39,7 +39,7 @@ class MasterController {
     private $loginModel;
     
     /**
-     * @var \view\MessageHolder
+     * @var \model\MessageHolder
      */
     private $messageHolder;
     
@@ -53,7 +53,7 @@ class MasterController {
      */
     public function __construct() {
         $this->loginModel = new \model\Login();
-        $this->messageHolder = new \view\MessageHolder();
+        $this->messageHolder = new \model\MessageHolder();
         $this->sessionsAndCookies = new \view\SessionsAndCookies($this->loginModel,
                                                                  $this->messageHolder);
         

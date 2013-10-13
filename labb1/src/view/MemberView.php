@@ -20,16 +20,19 @@ class MemberView {
     private $title = "Välkommen!";
         
     /**
-     * @var \view\MessageHolder
+     * @var \model\MessageHolder
      */
     private $messageHolder;
     
     /**
      * Concstructor which gets objects and set them as member variables
+     * @param \model\Login        $aLoginModel
+     * @param \view\Login         $aLoginView
+     * @param \model\MessageHolder $aMessageHolder
      */
     public function __construct(\model\Login        $aLoginModel,
                                 \view\Login         $aLoginView,
-                                \view\MessageHolder $aMessageHolder) {
+                                \model\MessageHolder $aMessageHolder) {
         
         $this->loginModel = $aLoginModel;
         $this->loginView = $aLoginView;
@@ -53,7 +56,7 @@ class MemberView {
 
     /**
      * Returns this views title
-     * return String
+     * @return String
      */
     public function getTitle() {
         return $this->title;

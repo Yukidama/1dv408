@@ -35,17 +35,17 @@ class Login {
    private static $keepLoggedIn = "keepLoggedIn";
    
    /**
-    * @var \view\MessageHolder
+    * @var \model\MessageHolder
     */
    private $messageHolder;
    
    /**
     * Constructor takes two objects and sets them to member variables
     * @param \model\Login $aLoginModel
-    * @param \view\MessageHolder $aMessageHolder
+    * @param \model\MessageHolder $aMessageHolder
     */
    public function __construct(\model\Login        $aLoginModel,
-                               \view\MessageHolder $aMessageHolder) {
+                               \model\MessageHolder $aMessageHolder) {
       $this->loginModel = $aLoginModel;
       
       $this->messageHolder = $aMessageHolder;
@@ -85,7 +85,7 @@ class Login {
    
    /**
     * Returns the static title set for this view
-    * return String
+    * @return String
     */
    public function getTitle() {
       return $this->title;

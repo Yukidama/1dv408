@@ -37,7 +37,7 @@ class SessionsAndCookies {
     private $loginModel;
     
     /**
-    * @var \view\MessageHolder
+    * @var \model\MessageHolder
     */
     private $messageHolder;
     
@@ -45,10 +45,15 @@ class SessionsAndCookies {
      * @var String
      */
     private static $cookieFolder = "cookieSecretFolder";
-        
+    
+    /**
+     * Constructor
+     * @param \model\Login $aLoginModel
+     * @param \model\MessageHolder $aMessageHolder
+     */
         
     public function __construct(\model\Login $aLoginModel,
-                                \view\MessageHolder $aMessageHolder) {
+                                \model\MessageHolder $aMessageHolder) {
         $this->loginModel = $aLoginModel;
         $this->messageHolder = $aMessageHolder;
         
@@ -140,11 +145,10 @@ class SessionsAndCookies {
     }
    
     /**
-    *@todo fixa inparameter (username, ta bort post)
     * Set a cookie with username and temporary password
     */ 
     public function setCookie($aUsername) {
-        //echo "sätter kaka!";
+
         $timeout = time() + 60;
         $randomAuth = $this->loginModel->getRandomCode();
         setcookie(self::$cookieUsername, $aUsername, $timeout);

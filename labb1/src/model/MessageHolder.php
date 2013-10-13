@@ -1,13 +1,13 @@
 <?php
 
-namespace view;
+namespace model;
 
 class MessageHolder {
     
     /**
      * @var String
      */
-    private static $sessionMessage = "view::MessageHolder::sessionMessage";
+    private static $sessionMessage = "model::MessageHolder::sessionMessage";
     
     /**
      * return message

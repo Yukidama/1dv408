@@ -12,6 +12,7 @@ class DateAndTime {
     
     /**
      * Constructor which takes a DateAndTime object
+     * @param \model\DateAndTime $aDateAndTime
      */
     public function __construct(\model\DateAndTime $aDateAndTime) {
         $this->dateAndTimeModel = $aDateAndTime;

@@ -1,0 +1,42 @@
+body {
+	font-family: Verdana;
+	color: #444;
+	font-size: 1em;
+	margin: 20px;
+}
+
+a {
+	color: #559;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+h1 {
+	font-size: 1.8em;
+	margin: 10px;
+}
+
+
+p {
+	margin-bottom: 1em;
+}
+
+
+form input {
+	padding: 4px;
+	margin: 10px;
+}
+
+form fieldset {
+	padding: 20px;
+
+	border: 1px solid #388;
+	border-radius: 4px;
+}
+
+.errorMessage {
+	color: #f22;
+}

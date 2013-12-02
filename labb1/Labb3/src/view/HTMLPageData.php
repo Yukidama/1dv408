@@ -1,8 +1,8 @@
 <?php
 
-namespace model;
+namespace view;
 
-class HTMLPage {
+class HTMLPageData {
     /**
      * @var String
      */

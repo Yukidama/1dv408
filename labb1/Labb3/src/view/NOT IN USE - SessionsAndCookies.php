@@ -101,26 +101,7 @@ class SessionsAndCookies {
         }
     }
     
-    /**
-     * Checks if session cookie have been manipulated by checking user agent and ip address
-     * @return BOOL
-     */
-    private function checkSessionHijack() {
-        if (isset($_SESSION[self::$sessionUserAgent]) && isset($_SESSION[self::$sessionIP])) {
-            if ($_SERVER['HTTP_USER_AGENT'] == $_SESSION[self::$sessionUserAgent] &&
-                $_SERVER['SERVER_ADDR'] == $_SESSION[self::$sessionIP]) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-        else {
-            $_SESSION[self::$sessionUserAgent] = $_SERVER["HTTP_USER_AGENT"];
-            $_SESSION[self::$sessionIP] = $_SERVER["SERVER_ADDR"];
-            return false;
-        }
-    }
+
    
     /**
      * Removes cookies and session
@@ -135,6 +116,7 @@ class SessionsAndCookies {
     /**
      * Save current user to session
      */
+    /*
     public function saveUserToSession() {
         try {
             $_SESSION[self::$sessionUserID] = $this->loginModel->getUserID();
@@ -143,6 +125,7 @@ class SessionsAndCookies {
             //User is not logged in.
         }
     }
+    */
    
     /**
     * Set a cookie with username and temporary password

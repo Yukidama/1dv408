@@ -6,7 +6,7 @@ namespace controller;
 require("src/controller/Login.php");
 require("src/controller/MemberStuff.php");
 
-require("src/model/HTMLPage.php");
+require("src/view/HTMLPageData.php");
 require("src/view/HTMLPage.php");
 
 require("src/model/Login.php");
@@ -16,7 +16,6 @@ require("src/model/DateAndTime.php");
 require("src/view/DateAndTime.php");
 
 require("src/view/Navigation.php");
-require("src/view/SessionsAndCookies.php");
 
 require("src/model/MessageHolder.php");
 
@@ -44,18 +43,11 @@ class MasterController {
     private $messageHolder;
     
     /**
-     * @var \view\SessionsAndCookies
-     */
-    private $sessionsAndCookies;
-    
-    /**
      * constructor which creates object needed
      */
     public function __construct() {
         $this->loginModel = new \model\Login();
         $this->messageHolder = new \model\MessageHolder();
-        $this->sessionsAndCookies = new \view\SessionsAndCookies($this->loginModel,
-                                                                 $this->messageHolder);
         
         $this->loginView = new \view\Login($this->loginModel,
                                            $this->messageHolder);
@@ -69,23 +61,22 @@ class MasterController {
      */
     public function runApplicationGetHTML() {
 
-        //Try to find session-cookie for user
-        $this->sessionsAndCookies->trySessionCookieLogin();
+        if (!$this->loginModel->trySessionLogin()) {
+            $this->loginView->tryCookieLogin();
+        }
         
-        $HTMLOutput = new \model\HTMLPage();
+        $HTMLOutput = new \view\HTMLPageData();
             
         if ($this->loginModel->isLoggedIn()) {
             $memberController = new \controller\MemberStuff($this->loginModel,
                                                             $this->loginView,
-                                                            $this->messageHolder,
-                                                            $this->sessionsAndCookies);
+                                                            $this->messageHolder);
             $HTMLOutput = $memberController->loggedInPage();
             //User is logged in
         }
         else {
             $loginController = new \controller\Login($this->loginModel,
-                                                     $this->loginView,
-                                                     $this->sessionsAndCookies);
+                                                     $this->loginView);
             $HTMLOutput = $loginController->loginPage();
             //User is not logged in
         }      

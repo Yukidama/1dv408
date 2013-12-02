@@ -16,28 +16,20 @@ class MemberStuff {
      * @var \view\Login
      */
     private $loginView;
-    
-    /**
-     * @var \view\SessionsAndCookies
-     */
-    private $sessionsAndCookies;
 
     /**
      * constructor which takes objects and set them as member variables
      * @param \model\Login $aLoginModel
      * @param \view\Login $aLoginView
      * @param \model\MessageHolder $aMessageHolder
-     * @param \view\SessionsAndCookies $aSessionsAndCookies
      */
     public function __construct(\model\Login                $aLoginModel,
                                 \view\Login                 $aLoginView,
-                                \model\MessageHolder         $aMessageHolder,
-                                \view\SessionsAndCookies    $aSessionsAndCookies) {
+                                \model\MessageHolder         $aMessageHolder) {
         
         $this->loginModel = $aLoginModel;
         $this->loginView = $aLoginView;
         $this->messageHolder = $aMessageHolder;
-        $this->sessionsAndCookies = $aSessionsAndCookies;
     }
     
     /**
@@ -52,14 +44,15 @@ class MemberStuff {
         $reloading = false;
         
         if ($this->loginView->userWantsLogout()) {
-            $this->loginView->logoutUser();
-            $this->sessionsAndCookies->removeSessionsAndCookies();
+            $this->loginModel->logoutUser();
+            $this->loginView->removeCookies();
+            $this->loginView->setLogoutMessage();
             $reloading = true;
         }
         if (!$reloading) {
             $title = $this->memberView->getTitle();
             $body = $this->memberView->getMemberPage();
-            $HTMLOutput = new \model\HTMLPage($title, $body);
+            $HTMLOutput = new \view\HTMLPageData($title, $body);
             return $HTMLOutput;
         }
         else {

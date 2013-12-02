@@ -2,12 +2,9 @@
 
 namespace model;
 
+require_once("UserList.php");
+
 class Login {
-    
-    /**
-     * @var Int
-     */
-    private $loggedInID;
     
     /**
      * @var String
@@ -15,24 +12,39 @@ class Login {
     private $randomSalt = "DR#ms66MC!";
     
     /**
-     * Temporary array as datasource for usernames.
-     * UserID will always be 1 or higher when running a database
-     * @var Array Usernames
+     * @var model/User
      */
-    private static $username = array("",
-                                     "Firsthere",
-                                     "Admin",
-                                     "OtherUser");
+    private $loggedInUser;
     
     /**
-     * Temporary array as datasource for password.
-     * UserID will always be 1 or higher when running a database
-     * @var String Passwords
-     */ 
-    private static $password = array("",
-                                     "Somethingelse here",
-                                     "Password",
-                                     "OtherPassword");
+     * @var String
+     */
+    private static $sessionUser = "model::Login::UserObject";
+    
+    /**
+     * User for protecting the application from session hijacks
+     * @var String
+     */
+    private static $sessionUserAgent = "view::Login::user_agent";
+    
+    /**
+     * User for protecting the application from session hijacks
+     * @var String
+     */
+    private static $sessionIP = "view::Login::ip_address";
+    
+    /**
+     * List of User's
+     * @var UserList
+     */
+    private $userList;
+    
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        $this->userList = new UserList();
+    }
     
     /**
      * Check if username och password are correct
@@ -42,15 +54,30 @@ class Login {
      */
     public function validateUser($aUsername, $aPassword) {
         assert(isset($aUsername) && isset($aPassword));
-        
-        $key = array_search($aUsername, self::$username);
-        if ($key > 0) {
-            if (self::$password[$key] == $aPassword) {
-                $this->loggedInID = $key;
-                return true;
-            }
+        try {
+            $this->loggedInUser = $this->userList->tryLoginUser($aUsername, $aPassword);
+            return true;
         }
-        return false;
+        catch (\Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if username och temppassword are correct
+     * @param String @aUsername
+     * @return BOOL
+     */
+    public function LoginCookieUser($aUsername) {
+        assert(isset($aUsername));
+        try {
+            $this->loggedInUser = $this->userList->tryLoginCookieUser($aUsername);
+            $this->saveToSession();
+            return true;
+        }
+        catch (\Exception $e) {
+            return false;
+        }
     }
     
     /**
@@ -58,43 +85,59 @@ class Login {
      * @return BOOL
      */
     public function isLoggedIn() {
-        if ($this->loggedInID > 0) {
+        if (isset($this->loggedInUser)) {
             return true;
         }
         return false;
     }
     
     /**
-     * returns users ID
-     * @return Int;
-     * @throws Exception when method used in wrong situation
+     * Saves current logged in User to session
      */
-    public function getUserID() {
-        if ($this->loggedInID < 1) {
-            throw new \Exeption("User is not logged in");
+    public function saveToSession() {
+        try {
+            $_SESSION[self::$sessionUser] = $this->loggedInUser;
+            $_SESSION[self::$sessionUserAgent] = $_SERVER['HTTP_USER_AGENT'];
+            $_SESSION[self::$sessionIP] = $_SERVER['SERVER_ADDR'];
         }
-        return $this->loggedInID;
+            catch(\Exception $e) {
+            //User is not logged in.
+        }
     }
     
     /**
-     * Set UserID
-     * @param Int $aUserID
+     * Sets user to the one in Session if correct
+     * @return BOOL
      */
-    public function setUserID($aUserID) {
-        $this->loggedInID = $aUserID;
+    public function trySessionLogin() {
+        if (!$this->checkSessionHijack()) {
+            if (isset($_SESSION[self::$sessionUser])) {
+                $this->loggedInUser = $_SESSION[self::$sessionUser];
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
-     * Login user with just a username
-     * @throws Exception if username cant be find.
+     * Checks if session cookie have been manipulated by checking user agent and ip address
+     * @return BOOL
      */
-    public function loginUser($aUsername) {
-        $userID = array_search($aUsername, self::$username);
-        if (is_numeric($userID) && $userID > 0) {
-            $this->setUserID($userID);
+    private function checkSessionHijack() {
+
+        if (isset($_SESSION[self::$sessionUserAgent]) && isset($_SESSION[self::$sessionIP])) {
+            if ($_SERVER['HTTP_USER_AGENT'] == $_SESSION[self::$sessionUserAgent] &&
+                $_SERVER['SERVER_ADDR'] == $_SESSION[self::$sessionIP]) {
+                return false;
+            }
+            else {
+                return true;
+            }
         }
         else {
-            throw new \Exception("Something wrong when using Username-login");
+            $_SESSION[self::$sessionUserAgent] = $_SERVER["HTTP_USER_AGENT"];
+            $_SESSION[self::$sessionIP] = $_SERVER["SERVER_ADDR"];
+            return false;
         }
     }
     
@@ -103,7 +146,16 @@ class Login {
      * @return String
      */
     public function getUsername() {
-        return self::$username[$this->loggedInID];
+        return $this->loggedInUser->getUsername();
+        //return "AnvŠndare";
+    }
+    
+    /**
+     * Logs the user out by unseting the member variable and session
+     */
+    public function logoutUser() {
+        unset($this->loggedInUser);
+        unset($_SESSION[self::$sessionUser]);
     }
     
     /**

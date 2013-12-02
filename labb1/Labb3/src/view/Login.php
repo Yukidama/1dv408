@@ -38,7 +38,22 @@ class Login {
     * @var \model\MessageHolder
     */
    private $messageHolder;
+
+    /**
+     * @var String
+     */
+    private static $cookieUsername = "view::Login::Username";
+    
+    /**
+     * @var String
+     */
+    private static $cookiePassword = "view::Login::Password";
    
+    /**
+     * @var String
+     */
+    private static $cookieFolder = "cookieSecretFolder";
+    
    /**
     * Constructor takes two objects and sets them to member variables
     * @param \model\Login $aLoginModel
@@ -95,9 +110,8 @@ class Login {
    * Tries to login user by validating the username och password.
    * @return BOOL
    */
-   public function loginProcedure() {
+   public function inputLooksGood() {
       //First things first, check if values are entered for both username and password
-      //If ok, check with model if username and password are valid.
    
       if (strlen($_POST[self::$postUsername]) < 1) {
          $this->messageHolder->setMessage("Användarnamn saknas");
@@ -106,14 +120,24 @@ class Login {
          $this->messageHolder->setMessage("Lösenord saknas");
       }
       else {
-         if ($this->loginModel->validateUser($_POST[self::$postUsername],
-                                             $_POST[self::$postPassword])) {
-            $this->messageHolder->setMessage("Inloggning lyckades");
-            return true;
-         }
-         else {
-            $this->messageHolder->setMessage("Felaktigt användarnamn och/eller lösenord");
-         }
+         return true;
+      }
+      return false;
+   }
+   
+   /**
+    * Tries to login user
+    * @return BOOL
+    */
+   public function loginUser() {
+      assert($_POST[self::$postUsername] && $_POST[self::$postPassword]);
+      if ($this->loginModel->validateUser($_POST[self::$postUsername],
+                                          $_POST[self::$postPassword])) {
+         $this->messageHolder->setMessage("Inloggning lyckades");
+         return true;
+      }
+      else {
+         $this->messageHolder->setMessage("Felaktigt användarnamn och/eller lösenord");
       }
       return false;
    }
@@ -127,6 +151,13 @@ class Login {
    }
    
    /**
+    * Set proper message for logout
+    */
+   public function setLogoutMessage() {
+      $this->messageHolder->setMessage("Du är nu utloggad");
+   }
+   
+   /**
     * Return a log out link
     * @return String
     */
@@ -134,7 +165,7 @@ class Login {
       return "<a href=\"?" . self::$getLogout . "\">Logga ut</a>";
    }
    
-      /**
+   /**
     * Check if user wants to use cookies for login in the future
     * @return BOOL
     */
@@ -145,11 +176,60 @@ class Login {
       return false;
    }
    
+   // -- Cookie stuff! --- //
+   
+   public function tryCookieLogin() {
+      if (isset($_COOKIE[self::$cookieUsername])) {
+         return $this->tryCookie();
+      }
+   }
+    
+    /**
+     * Try to use Cookies to login
+     */
+   private function tryCookie() {
+      $fileData = file_get_contents(self::$cookieFolder."/".$_COOKIE[self::$cookieUsername].".txt");
+      if ($fileData) {
+         $persistanceArray = explode(',', $fileData);
+         if ($persistanceArray[0] < time()) {
+            $this->removeCookies();
+            $this->messageHolder->setMessage("Felaktig information i cookie");
+         }
+         else if ($persistanceArray[1] != $_COOKIE[self::$cookiePassword]) {
+            $this->removeCookies();
+            $this->messageHolder->setMessage("Felaktig information i cookie");
+         }
+         else {
+            $this->loginModel->loginCookieUser($_COOKIE[self::$cookieUsername]);
+            $this->messageHolder->setMessage("Inloggning lyckades via cookie");
+            return true;
+         }
+      }
+      return false;
+   }
+    
+
+   
    /**
-   * Unset cookies, sessiona and LoginModels userID
-   */
-   public function logoutUser() {
-      $this->loginModel->setUserID(null);
-      $this->messageHolder->setMessage("Du är nu utloggad");
+    * Removes cookies and session
+    */
+   public function removeCookies() {
+      setcookie(self::$cookiePassword, "", -3600);
+      setcookie(self::$cookieUsername, "", -3600);
+   }
+
+   
+   /**
+   * Set a cookie with username and temporary password
+   */ 
+   public function setCookie($aUsername) {
+      $timeout = time() + 60;
+      $randomAuth = $this->loginModel->getRandomCode();
+      setcookie(self::$cookieUsername, $aUsername, $timeout);
+      setcookie(self::$cookiePassword, $randomAuth, $timeout);
+      
+      file_put_contents(self::$cookieFolder."/$aUsername.txt",
+                        "$timeout,$randomAuth");
+      $this->messageHolder->setMessage("Inloggning lyckades och vi kommer ihåg dig nästa gång");
    }
 }

@@ -9,7 +9,7 @@ class HTMLPage {
      * @param \model\HTMLPage $htmlObj
      * @return String HTML
      */
-    function getHTMLPage(\model\HTMLPage $htmlObj) {
+    function getHTMLPage(HTMLPageData $htmlObj) {
         return "
             <!doctype html>
             <html lang=\"sv\">
